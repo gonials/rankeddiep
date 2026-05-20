@@ -1,0 +1,143 @@
+<!--
+    DiepCustom - custom tank game server that shares diep.io's WebSocket protocol
+    Copyright (C) 2022 ABCxFF (github.com/ABCxFF)
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as published
+    by the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program. If not, see <https://www.gnu.org/licenses/>
+-->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="icon" href="https://i.imgur.com/P3JZTAZ.png"/>
+    <title>4v4.lol - Login Required</title>
+    <link href="https://fonts.googleapis.com/css?family=Ubuntu:700" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: rgba(20, 20, 30, 0.95);
+            margin: 0;
+            overflow: hidden;
+            font-family: "Ubuntu", sans-serif;
+        }
+
+        /* Auth Screen Styles */
+        #authScreen {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            background: rgba(20, 20, 30, 0.95);
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .auth-container {
+            background: rgba(30, 30, 40, 0.95);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 60px 80px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            animation: slideUp 0.6s ease-out;
+            max-width: 500px;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .auth-logo {
+            font-size: 56px;
+            font-weight: bold;
+            color: #00d4ff;
+            margin-bottom: 20px;
+            white-space: nowrap;
+        }
+
+        .auth-title {
+            color: #fff;
+            font-size: 32px;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .auth-subtitle {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 16px;
+            margin-bottom: 40px;
+        }
+
+        .auth-btn {
+            background: rgba(0, 212, 255, 0.2);
+            border: 1px solid rgba(0, 212, 255, 0.5);
+            color: white;
+            padding: 18px 50px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: "Ubuntu", sans-serif;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .auth-btn:hover {
+            background: rgba(0, 212, 255, 0.3);
+            border-color: rgba(0, 212, 255, 0.7);
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .auth-btn:active {
+            transform: translateY(-1px);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Auth Screen -->
+    <div id="authScreen">
+        <div class="auth-container">
+            <div class="auth-logo">Diep Ranked</div>
+            <div class="auth-subtitle">Login with Discord to continue</div>
+            <a href="https://discord.com/oauth2/authorize?client_id=1450639916823220224&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%2Fauth&scope=identify" class="auth-btn">
+                Login with Discord
+            </a>
+        </div>
+    </div>
+</body>
+</html>
+

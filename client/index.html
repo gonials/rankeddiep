@@ -1,0 +1,1822 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="icon" href="https://i.imgur.com/P3JZTAZ.png"/>
+    <title>4v4.lol</title>
+    <link href="https://fonts.googleapis.com/css?family=Ubuntu:700" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: rgba(20, 20, 30, 0.95);
+            margin: 0;
+            overflow: hidden;
+            font-family: "Ubuntu", sans-serif;
+        }
+
+        /* Auth Screen Styles */
+        #authScreen {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            background: rgba(20, 20, 30, 0.95);
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .auth-container {
+            background: rgba(30, 30, 40, 0.95);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 60px 80px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            animation: slideUp 0.6s ease-out;
+            max-width: 500px;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .auth-logo {
+            font-size: 56px;
+            font-weight: bold;
+            color: #00d4ff;
+            margin-bottom: 20px;
+            white-space: nowrap;
+        }
+
+        .auth-title {
+            color: #fff;
+            font-size: 32px;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .auth-subtitle {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 16px;
+            margin-bottom: 40px;
+        }
+
+        .auth-btn {
+            background: rgba(0, 212, 255, 0.2);
+            border: 1px solid rgba(0, 212, 255, 0.5);
+            color: white;
+            padding: 18px 50px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: "Ubuntu", sans-serif;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .auth-btn:hover {
+            background: rgba(0, 212, 255, 0.3);
+            border-color: rgba(0, 212, 255, 0.7);
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .auth-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .error-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        /* Game Screen Styles */
+        #gameScreen {
+            display: none;
+            position: relative;
+            width: 100%;
+            height: 100vh;
+        }
+
+        #canvas {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            cursor: default;
+            z-index: 0;
+        }
+
+        /* Profile Widget */
+        #profileWidget {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        #statsWidget {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 9998;
+            display: none;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            font-family: 'Ubuntu', sans-serif;
+        }
+
+        .bottom-pill {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(20, 20, 30, 0.9);
+            padding: 10px 16px;
+            border-radius: 50px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .bottom-pill:hover {
+            background: rgba(30, 30, 40, 0.95);
+            border-color: rgba(0, 212, 255, 0.5);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .stats-pill {
+            /* Plain style, no glow - matches other bottom pills */
+        }
+
+        .profile-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid #00d4ff;
+            background: #1a1a2e;
+        }
+
+        .profile-info {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .profile-name {
+            color: #fff;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .profile-role {
+            color: #00d4ff;
+            font-size: 11px;
+            font-weight: normal;
+        }
+
+        /* Profile Menu */
+        #profileMenu {
+            display: none;
+            position: fixed;
+            top: 50%;
+            right: 40px;
+            transform: translateY(-50%);
+            width: 360px;
+            max-height: 90vh;
+            overflow-y: auto;
+            background: rgba(20, 20, 30, 0.98);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 0;
+            z-index: 9998;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            animation: slideIn 0.3s ease-out;
+            pointer-events: auto;
+        }
+
+        #profileMenu::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        #profileMenu::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        #profileMenu::-webkit-scrollbar-thumb {
+            background: rgba(0, 212, 255, 0.3);
+            border-radius: 4px;
+        }
+
+        #profileMenu::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 212, 255, 0.5);
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50%) translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(-50%) translateX(0);
+            }
+        }
+
+        .menu-close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            width: 32px;
+            height: 32px;
+            background: rgba(255, 50, 50, 0.2);
+            border: 1px solid rgba(255, 50, 50, 0.4);
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: #ff5555;
+            transition: all 0.2s ease;
+            z-index: 10;
+        }
+
+        .menu-close:hover {
+            background: rgba(255, 50, 50, 0.3);
+            border-color: rgba(255, 50, 50, 0.6);
+            transform: scale(1.1);
+        }
+
+        .menu-header {
+            padding: 24px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .menu-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 3px solid #00d4ff;
+            background: #1a1a2e;
+        }
+
+        .menu-user-info {
+            flex: 1;
+        }
+
+        .menu-username {
+            color: #fff;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .menu-user-role {
+            color: #00d4ff;
+            font-size: 13px;
+            padding: 4px 12px;
+            background: rgba(0, 212, 255, 0.15);
+            border-radius: 12px;
+            display: inline-block;
+        }
+
+        .menu-section {
+            padding: 12px 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .menu-section:last-child {
+            border-bottom: none;
+        }
+
+        .menu-section-title {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+            padding: 0 4px;
+        }
+
+        .keybind-label {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+            padding: 0 4px;
+            font-weight: 600;
+        }
+
+        .keybind-diepstyle {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.2), rgba(16, 185, 129, 0.2)) !important;
+            border-color: rgba(34, 197, 94, 0.5) !important;
+        }
+
+        .keybind-diepstyle:hover {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.3), rgba(16, 185, 129, 0.3)) !important;
+            border-color: rgba(34, 197, 94, 0.7) !important;
+        }
+
+        /* Custom Server Dropdown */
+        .custom-dropdown {
+            position: relative;
+            width: 100%;
+        }
+
+        .custom-dropdown-selected {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 10px 12px;
+            font-size: 13px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: "Ubuntu", sans-serif;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            user-select: none;
+        }
+
+        .custom-dropdown-selected:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(0, 212, 255, 0.5);
+        }
+
+        .custom-dropdown-arrow {
+            transition: transform 0.2s ease;
+            font-size: 10px;
+        }
+
+        .custom-dropdown-selected.open .custom-dropdown-arrow {
+            transform: rotate(180deg);
+        }
+
+        .custom-dropdown-options {
+            position: absolute;
+            top: calc(100% + 4px);
+            left: 0;
+            right: 0;
+            background: rgba(20, 20, 30, 0.98);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            overflow: hidden;
+            z-index: 1000;
+            display: none;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+        }
+
+        .custom-dropdown-options.open {
+            display: block;
+            animation: dropdownFadeIn 0.2s ease-out;
+        }
+
+        @keyframes dropdownFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .custom-dropdown-option {
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            color: white;
+            font-size: 13px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .custom-dropdown-option:hover {
+            background: rgba(0, 212, 255, 0.15);
+        }
+
+        .custom-dropdown-option.selected {
+            background: rgba(0, 212, 255, 0.1);
+            color: #00d4ff;
+        }
+
+        .custom-dropdown-option::before {
+            content: "";
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: transparent;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.15s ease;
+        }
+
+        .custom-dropdown-option.selected::before {
+            background: #00d4ff;
+            border-color: #00d4ff;
+            box-shadow: 0 0 8px rgba(0, 212, 255, 0.6);
+        }
+
+        .console-commands-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+        }
+
+        .toggle-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 8px 10px;
+            font-size: 10px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: "Ubuntu", sans-serif;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 6px;
+            min-width: 0;
+        }
+
+        .toggle-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(0, 212, 255, 0.3);
+        }
+
+        .toggle-btn.active {
+            background: rgba(0, 212, 255, 0.15);
+            border-color: rgba(0, 212, 255, 0.5);
+        }
+
+        .toggle-btn.active .toggle-indicator {
+            background: #00d4ff;
+        }
+
+        .toggle-btn.important {
+            background: linear-gradient(135deg, rgba(123, 47, 247, 0.08), rgba(147, 51, 234, 0.08));
+            border-color: rgba(123, 47, 247, 0.2);
+            border-width: 2px;
+        }
+
+        .toggle-btn.important:hover {
+            background: linear-gradient(135deg, rgba(123, 47, 247, 0.15), rgba(147, 51, 234, 0.15));
+            border-color: rgba(123, 47, 247, 0.4);
+        }
+
+        .toggle-btn.important.active {
+            background: linear-gradient(135deg, rgba(123, 47, 247, 0.35), rgba(147, 51, 234, 0.35));
+            border-color: rgba(123, 47, 247, 0.8);
+        }
+
+        .toggle-btn.important.active .toggle-indicator {
+            background: #7b2ff7;
+        }
+
+        .toggle-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
+            background: rgba(255, 255, 255, 0.2);
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .toggle-label {
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            min-width: 0;
+        }
+
+        .menu-button {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 10px 14px;
+            font-size: 12px;
+            font-weight: bold;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: "Ubuntu", sans-serif;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .menu-button.compact {
+            padding: 8px 12px;
+            font-size: 14px;
+        }
+
+        .menu-button.small {
+            padding: 6px 10px;
+            font-size: 13px;
+        }
+
+        .button-text-large {
+            font-size: 15px;
+        }
+
+        .menu-button:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(0, 212, 255, 0.5);
+            transform: translateX(4px);
+        }
+
+        .menu-button.danger {
+            background: rgba(255, 50, 50, 0.1);
+            border-color: rgba(255, 50, 50, 0.3);
+        }
+
+        .menu-button.danger:hover {
+            background: rgba(255, 50, 50, 0.2);
+            border-color: rgba(255, 50, 50, 0.5);
+        }
+
+        .menu-button.admin {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .menu-button.admin:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(0, 212, 255, 0.5);
+        }
+
+        .button-icon {
+            font-size: 18px;
+        }
+
+        /* Announcement Modal */
+        .announcement-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 10002;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            pointer-events: none;
+        }
+
+        .announcement-modal.active {
+            display: flex;
+            pointer-events: auto;
+        }
+
+        .announcement-modal-content {
+            width: 90%;
+            max-width: 450px;
+            background: rgba(20, 20, 30, 0.98);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            animation: scaleIn 0.2s ease-out;
+            pointer-events: auto;
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .announcement-modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 24px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .announcement-modal-header h3 {
+            font-size: 18px;
+            font-weight: bold;
+            color: #00d4ff;
+            margin: 0;
+        }
+
+        .announcement-modal-close {
+            width: 32px;
+            height: 32px;
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 24px;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .announcement-modal-close:hover {
+            color: white;
+        }
+
+        .announcement-modal-body {
+            padding: 24px;
+        }
+
+        .announcement-input-group {
+            margin-bottom: 16px;
+        }
+
+        .announcement-input-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .announcement-input-group input,
+        .announcement-input-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: white;
+            font-size: 13px;
+            font-family: "Ubuntu", sans-serif;
+            transition: border-color 0.2s ease;
+        }
+
+        .announcement-input-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .announcement-input-group input:focus,
+        .announcement-input-group textarea:focus {
+            outline: none;
+            border-color: #00d4ff;
+        }
+
+        .announcement-input-group input[type="color"] {
+            height: 40px;
+            cursor: pointer;
+            padding: 4px;
+        }
+
+        .announcement-modal-footer {
+            display: flex;
+            gap: 12px;
+            padding: 24px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .announcement-btn {
+            flex: 1;
+            padding: 10px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: "Ubuntu", sans-serif;
+        }
+
+        .announcement-btn-cancel {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .announcement-btn-cancel:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .announcement-btn-send {
+            background: rgba(0, 212, 255, 0.2);
+            border: 1px solid rgba(0, 212, 255, 0.5);
+            color: white;
+        }
+
+        .announcement-btn-send:hover {
+            background: rgba(0, 212, 255, 0.3);
+            border-color: rgba(0, 212, 255, 0.7);
+        }
+
+        /* Text input */
+        #textInputContainer {
+            display: none;
+            position: absolute;
+            z-index: 10000;
+        }
+
+        #textInput {
+            background-color: transparent;
+            font-family: "Ubuntu";
+            padding: 0;
+            border: 0;
+            outline: none;
+            color: black;
+        }
+
+        /* Loading */
+        #loading {
+            color: #FFFFFF;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 48pt;
+            font-family: sans-serif;
+            font-weight: bold;
+            cursor: default;
+            z-index: 1;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Auth Screen -->
+    <div id="authScreen">
+        <div class="auth-container">
+            <div class="auth-logo">Diep Ranked</div>
+            <div class="auth-subtitle">Login with Discord to continue</div>
+            <a href="https://discord.com/oauth2/authorize?client_id=1450639916823220224&response_type=code&redirect_uri=http://localhost/auth&scope=identify" class="auth-btn">
+                Login with Discord
+            </a>
+        </div>
+    </div>
+
+    <!-- Not Verified Screen -->
+    <div id="notVerifiedScreen" style="display: none;">
+        <div class="auth-container">
+            <div class="error-icon">⚠️</div>
+            <div class="auth-title">Verification Required</div>
+            <div class="auth-subtitle">You must be verified in our Discord server to play</div>
+            <a href="https://discord.gg/RgUqreJ7FT" class="auth-btn" target="_blank">
+                <span class="button-icon">✓</span> Join & Verify
+            </a>
+        </div>
+    </div>
+
+    <!-- Not In Server Screen -->
+    <div id="notInServerScreen" style="display: none;">
+        <div class="auth-container">
+            <div class="error-icon">🔒</div>
+            <div class="auth-title">Server Required</div>
+            <div class="auth-subtitle">Join our Discord server to access the game</div>
+            <a href="https://discord.gg/RgUqreJ7FT" class="auth-btn" target="_blank">
+                <span class="button-icon">💬</span> Join Discord Server
+            </a>
+        </div>
+    </div>
+
+    <!-- Game Screen -->
+    <div id="gameScreen">
+        <span id="loading">Loading...</span>
+        <canvas id="canvas" width="800" height="800"></canvas>
+
+        <!-- Bottom Bar: Profile + Stats -->
+        <div id="statsWidget">
+            <div id="profilePill" class="bottom-pill" style="display:none;">
+                <div id="profileWidget">
+                    <img id="profileAvatar" class="profile-avatar" src="" alt="Avatar">
+                    <div class="profile-info">
+                        <div id="profileName" class="profile-name">Loading...</div>
+                        <div id="profileRole" class="profile-role">Member</div>
+                    </div>
+                </div>
+            </div>
+            <div class="bottom-pill stats-pill" onclick="window.open('/stats.html','_blank')" title="View Stats">
+                <span style="color: #fff; font-size: 14px; font-weight: bold;">Stats</span>
+            </div>
+        </div>
+
+        <!-- Profile Menu -->
+        <div id="profileMenu">
+            <div class="menu-close" id="menuCloseBtn">×</div>
+            <div class="menu-header">
+                <img id="menuAvatar" class="menu-avatar" src="" alt="Avatar">
+                <div class="menu-user-info">
+                    <div id="menuUsername" class="menu-username">Loading...</div>
+                    <div id="menuUserRole" class="menu-user-role">Member</div>
+                </div>
+            </div>
+            
+            <!-- Server Selector Section -->
+            <div class="menu-section">
+                <div class="menu-section-title">Server Region</div>
+                <div class="custom-dropdown" id="serverDropdown">
+                    <div class="custom-dropdown-selected" id="serverDropdownSelected">
+                        <span id="serverDropdownText">Select Server</span>
+                        <span class="custom-dropdown-arrow">▼</span>
+                    </div>
+                    <div class="custom-dropdown-options" id="serverDropdownOptions">
+                        <!-- Options will be dynamically added here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Keybind Settings Section -->
+            <div class="menu-section">
+                <div class="menu-section-title">Keybinds</div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                    <div>
+                        <div class="keybind-label">This Menu</div>
+                        <button id="keybindBtn" class="menu-button compact">
+                            <span id="keybindText" class="button-text-large">Press Escape</span>
+                        </button>
+                    </div>
+                    <div>
+                        <div class="keybind-label">Diep Style</div>
+                        <button id="diepStyleKeybindBtn" class="menu-button compact keybind-diepstyle">
+                            <span id="diepStyleKeybindText" class="button-text-large">Press Q</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Team HUD Section -->
+            <div class="menu-section">
+                <div class="menu-section-title">Team HUD</div>
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: rgba(255,255,255,0.9); font-size: 14px;">
+                            <input type="checkbox" id="mainMenuTeamHudEnabled" style="width: 18px; height: 18px; accent-color: #00d4ff;">
+                            <span>Health HUD</span>
+                        </label>
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <span class="keybind-label" style="margin: 0;">Toggle</span>
+                            <button id="mainMenuTeamHudBindBtn" class="menu-button compact" style="min-width: 90px;">
+                                <span id="mainMenuTeamHudBindText" class="button-text-large">Tab</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div style="display: flex; align-items: center;">
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: rgba(255,255,255,0.9); font-size: 14px;">
+                            <input type="checkbox" id="mainMenuTeamArrowsEnabled" style="width: 18px; height: 18px; accent-color: #00d4ff;">
+                            <span>Teammate direction arrows</span>
+                        </label>
+                        <div style="display:flex;align-items:center;gap:6px;margin-left:12px;font-size:12px;color:rgba(148,163,184,0.9);">
+                            <span>Size:</span>
+                            <select id="mainMenuTeamArrowsScale" class="filter-select" style="padding:2px 6px;min-width:80px;">
+                                <option value="0.8">Small</option>
+                                <option value="1" selected>Default</option>
+                                <option value="1.3">Large</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Console Commands Section -->
+            <div class="menu-section">
+                <div class="menu-section-title">Console Commands</div>
+                <div class="console-commands-grid" id="consoleCommandsGrid">
+                    <!-- Commands will be dynamically added here -->
+                </div>
+                <button id="restoreDefaultsBtn" class="menu-button compact" style="margin-top: 8px;">
+                    <span class="button-icon">↻</span>
+                    <span>Restore Defaults</span>
+                </button>
+            </div>
+
+            <!-- Admin Commands Section (shown only for managers+) -->
+            <div class="menu-section" id="adminCommandsSection" style="display: none;">
+                <div class="menu-section-title">Admin Commands</div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+                    <button id="endGameBtn" class="toggle-btn">
+                        <span class="toggle-label">End Game</span>
+                    </button>
+                    <button id="announcementBtn" class="toggle-btn">
+                        <span class="toggle-label">Announcement</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Logout Section -->
+            <div class="menu-section">
+                <button id="logoutBtn" class="menu-button compact danger">
+                    <span class="button-text-large">Logout</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Text input -->
+        <div id="textInputContainer">
+            <input id="textInput">
+        </div>
+    </div>
+
+    <!-- Announcement Modal -->
+    <div id="announcementModal" class="announcement-modal">
+        <div class="announcement-modal-content">
+            <div class="announcement-modal-header">
+                <h3>Send Announcement</h3>
+                <button class="announcement-modal-close" id="announcementModalClose">×</button>
+            </div>
+            <div class="announcement-modal-body">
+                <div class="announcement-input-group">
+                    <label>Message</label>
+                    <textarea id="announcementMessage" placeholder="Enter your announcement message..."></textarea>
+                </div>
+                <div class="announcement-input-group">
+                    <label>Color (Hex)</label>
+                    <input type="color" id="announcementColor" value="#00d4ff">
+                </div>
+                <div class="announcement-input-group">
+                    <label>Duration (seconds)</label>
+                    <input type="number" id="announcementTTL" value="15" min="1" max="60">
+                </div>
+                <div class="announcement-input-group">
+                    <label>ID (optional)</label>
+                    <input type="text" id="announcementID" placeholder="announcement-id">
+                </div>
+            </div>
+            <div class="announcement-modal-footer">
+                <button class="announcement-btn announcement-btn-cancel" id="announcementCancel">Cancel</button>
+                <button class="announcement-btn announcement-btn-send" id="announcementSend">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Third party wasm patcher -->
+    <script src="https://cdn.jsdelivr.net/gh/Qwokka/wail.min.js@5e32d36bd7a5e0830d1ff4b64d3587aea13f77da/wail.min.js" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="./lz4.min.js"></script>
+    <script>
+        var Buffer = require('buffer').Buffer;
+        var LZ4 = require('lz4');
+    </script>
+
+    <!-- Scripts -->
+    <script>
+        const SERVERS = [
+            { name: "USA", value: "4v4.lol:8080" },
+            { name: "Europe", value: "eu.4v4.lol:8080" },
+            { name: "Brazil", value: "br.4v4.lol:8080" },
+            { name: "Singapore", value: "sg.4v4.lol:8080" },
+            { Name: "Sydney", value: "syd.4v4.lol:8080" },
+            // { name: "Localhost", value: "localhost:8080" }
+        ];
+
+        window.currentServer = localStorage.getItem("selectedServer") || SERVERS[0].value;
+        window.API_URL = location.protocol + "//" + currentServer + "/api/";
+        console.log("Initial API_URL:", window.API_URL);
+    </script>
+    <script src="./config.js"></script>
+    <script src="./input.js"></script>
+    <script src="./dma.js"></script>
+    <script src="./loader.js"></script>
+    <script src="./util.js"></script>
+
+    <script>
+        // Console command configurations
+        const consoleCommands = [
+            // IMPORTANT COMMANDS - Always at top
+            { name: "ren_ui", displayName: "Show UI", description: "Render UI layer", default: true, important: true },
+            { name: "net_predict_movement", displayName: "Net Predict", description: "Enable clientside prediction for movement", default: true, important: true },
+            // Regular commands
+            { name: "ren_fps", displayName: "Show FPS", description: "Render FPS", default: false },
+            { name: "ren_achievements", description: "Render achievements", default: true },
+            { name: "ren_health_bars", description: "Render health bars", default: true },
+            { name: "ren_names", description: "Render names", default: true },
+            { name: "ren_raw_health_values", description: "Render raw health bar values", default: false },
+            { name: "ren_scoreboard", description: "Render scoreboard", default: true },
+            { name: "ren_scoreboard_names", description: "Render scoreboard names", default: true },
+            { name: "ren_solid_background", description: "Render background as solid color", default: true },
+            { name: "ren_stats", description: "Render stat upgrades", default: true },
+            { name: "ren_upgrades", description: "Render class upgrades", default: true }
+        ];
+
+        // Auth & UI Management
+        const authScreen = document.getElementById("authScreen");
+        const notVerifiedScreen = document.getElementById("notVerifiedScreen");
+        const notInServerScreen = document.getElementById("notInServerScreen");
+        const gameScreen = document.getElementById("gameScreen");
+        const profileWidget = document.getElementById("profileWidget");
+        const profilePill = document.getElementById("profilePill");
+        const profileMenu = document.getElementById("profileMenu");
+        const adminCommandsSection = document.getElementById("adminCommandsSection");
+        const endGameBtn = document.getElementById("endGameBtn");
+        const announcementBtn = document.getElementById("announcementBtn");
+       // const screenshotBtn = document.getElementById("screenshotBtn");
+
+
+        // Check authentication status on load
+        (async function checkAuth() {
+            try {
+                const sessionData = await getLoginData();
+                
+                if (!sessionData || !sessionData.sessionId) {
+                    authScreen.style.display = "flex";
+                    return;
+                }
+
+                authScreen.style.display = "none";
+                gameScreen.style.display = "block";
+                setupServerDropdown();
+               // loadUserProfile(sessionData);
+                
+            } catch (error) {
+                console.error("Auth check failed:", error);
+                authScreen.style.display = "flex";
+            }
+        })();
+
+        function loadUserProfile(sessionData) {
+            const userId = sessionData.discordUserId || "0";
+            const username = sessionData.discordUsername || "Player";
+            const avatarHash = sessionData.discordAvatar;
+            
+            // Build proper Discord avatar URL
+            let avatarUrl;
+            if (avatarHash) {
+                avatarUrl = `https://cdn.discordapp.com/avatars/${userId}/${avatarHash}.png`;
+            } else {
+                avatarUrl = `https://cdn.discordapp.com/embed/avatars/${parseInt(userId) % 5}.png`;
+            }
+            
+            // Wait for Module.permissionLevel to be set by the game
+            //setTimeout(() => {
+                const accessLevel = typeof Module !== "undefined" && Module.permissionLevel !== undefined 
+                    ? Module.permissionLevel 
+                    : (sessionData.accessLevel !== undefined ? sessionData.accessLevel : 0);
+                
+                let role = "Member";
+                
+                switch(accessLevel) {
+                    case 3:
+                        role = "Admin";
+                        break;
+                    case 2:
+                        role = "Moderator";
+                        break;
+                    case 1:
+                        role = "Manager";
+                        break;
+                    case 0:
+                        role = "Verified";
+                        break;
+                    case -1:
+                        role = "Unverified";
+                        break;
+                    default:
+                        role = "Member";
+                }
+                
+                // Update profile role displays
+                document.getElementById("profileRole").textContent = role;
+                document.getElementById("menuUserRole").textContent = role;
+                
+                // Show admin section if accessLevel is 1 (Manager) or higher
+                if (accessLevel >= 1) {
+                    adminCommandsSection.style.display = "block";
+                }
+                
+                // Show announcement button only for Admin role (accessLevel 3)
+                if (accessLevel >= 3) {
+                    announcementBtn.style.display = "flex";
+                }
+            //}, 1000);
+            
+            // Update profile widget
+            document.getElementById("profileAvatar").src = avatarUrl;
+            document.getElementById("profileName").textContent = username;
+            document.getElementById("profilePill").style.display = "flex";
+            
+            // Update profile menu
+            document.getElementById("menuAvatar").src = avatarUrl;
+            document.getElementById("menuUsername").textContent = username;
+
+            // Initialize console commands and server dropdown
+            // setTimeout(() => {
+            console.log("Initializing UI components...");
+                initConsoleCommands();
+                checkIfInGame();
+            // }, 1500);
+        }
+
+        // Setup custom server dropdown
+        function setupServerDropdown() {
+            const dropdownContainer = document.getElementById("serverDropdown");
+            const selectedElement = document.getElementById("serverDropdownSelected");
+            const textElement = document.getElementById("serverDropdownText");
+            const optionsElement = document.getElementById("serverDropdownOptions");
+            
+            if (!dropdownContainer || !selectedElement || !textElement || !optionsElement) {
+                console.error("Server dropdown elements not found!");
+                return;
+            }
+            
+            // Get current server
+            const currentServer = localStorage.getItem("selectedServer") || "4v4.lol:8080";
+            const currentServerData = SERVERS.find(s => s.value === currentServer) || SERVERS[0];
+            textElement.textContent = currentServerData.name;
+            
+            console.log("Server dropdown initialized with:", currentServer);
+            
+            // Populate options
+            optionsElement.innerHTML = "";
+            SERVERS.forEach(server => {
+                const option = document.createElement("div");
+                option.className = "custom-dropdown-option";
+                if (server.value === currentServer) {
+                    option.classList.add("selected");
+                }
+                option.textContent = server.name;
+                option.dataset.value = server.value;
+                
+                option.addEventListener("click", (e) => {
+                    e.stopPropagation();
+                    
+                    // Update selection
+                    const newServer = server.value;
+                    localStorage.setItem("selectedServer", newServer);
+                    window.currentServer = newServer
+                    window.API_URL = location.protocol + "//" + newServer + "/api/";
+                    
+                    // Update UI
+                    textElement.textContent = server.name;
+                    document.querySelectorAll(".custom-dropdown-option").forEach(opt => {
+                        opt.classList.remove("selected");
+                    });
+                    option.classList.add("selected");
+                    
+                    // Close dropdown
+                    closeDropdown();
+                    
+                    // Execute reconnect commands
+                    if (typeof input !== "undefined" && input.execute) {
+                        input.execute("lb_reconnect");
+                        input.execute("util_reload_servers");
+                    }
+                    
+                    console.log("Server changed to:", newServer);
+                    
+                    // Show notification
+                    const notification = document.createElement("div");
+                    notification.textContent = `Connected to ${server.name}`;
+                    notification.style.cssText = `
+                        position: fixed;
+                        top: 20px;
+                        right: 20px;
+                        background: rgba(0, 212, 255, 0.9);
+                        color: white;
+                        padding: 12px 20px;
+                        border-radius: 8px;
+                        font-family: Ubuntu, sans-serif;
+                        font-weight: bold;
+                        z-index: 10001;
+                        animation: slideInRight 0.3s ease-out;
+                    `;
+                    document.body.appendChild(notification);
+                    setTimeout(() => {
+                        notification.style.animation = "slideOutRight 0.3s ease-in";
+                        setTimeout(() => notification.remove(), 300);
+                    }, 2000);
+                });
+                
+                optionsElement.appendChild(option);
+            });
+            
+            // Toggle dropdown on click
+            selectedElement.addEventListener("click", (e) => {
+                e.stopPropagation();
+                toggleDropdown();
+            });
+            
+            function toggleDropdown() {
+                const isOpen = optionsElement.classList.contains("open");
+                if (isOpen) {
+                    closeDropdown();
+                } else {
+                    openDropdown();
+                }
+            }
+            
+            function openDropdown() {
+                optionsElement.classList.add("open");
+                selectedElement.classList.add("open");
+            }
+            
+            function closeDropdown() {
+                optionsElement.classList.remove("open");
+                selectedElement.classList.remove("open");
+            }
+            
+            // Close dropdown when clicking outside
+            document.addEventListener("click", (e) => {
+                if (!dropdownContainer.contains(e.target)) {
+                    closeDropdown();
+                }
+            });
+        }
+
+        // Add notification animations
+        const style = document.createElement("style");
+        style.textContent = `
+            @keyframes slideInRight {
+                from {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            @keyframes slideOutRight {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Check if player is in game and hide UI accordingly
+        let menuManuallyOpened = false;
+        function checkIfInGame() {
+            setInterval(() => {
+                if (typeof input !== "undefined" && typeof input.should_prevent_unload === "function") {
+                    const inGame = input.should_prevent_unload() === 1;
+                    const bottomBar = document.getElementById("statsWidget");
+                    
+                    if (inGame) {
+                        if (!menuManuallyOpened) {
+                            profileMenu.style.display = "none";
+                        }
+                        bottomBar.style.display = "none";
+                    } else {
+                        bottomBar.style.display = "flex";
+                        menuManuallyOpened = false;
+                    }
+                }
+            }, 100);
+        }
+
+        // LocalStorage helper functions for console commands
+        function getConsoleCommandState(commandName) {
+            const key = `consoleCommand_${commandName}`;
+            const stored = localStorage.getItem(key);
+            return stored !== null ? (stored === "true") : null;
+        }
+
+        function setConsoleCommandState(commandName, value) {
+            const key = `consoleCommand_${commandName}`;
+            localStorage.setItem(key, value.toString());
+        }
+
+        function clearAllConsoleCommandStates() {
+            consoleCommands.forEach(cmd => {
+                const key = `consoleCommand_${cmd.name}`;
+                localStorage.removeItem(key);
+            });
+        }
+
+        // Initialize console command toggles
+        let consoleCommandsInitialized = false;
+        function initConsoleCommands() {
+            if (consoleCommandsInitialized) return;
+            
+            const grid = document.getElementById("consoleCommandsGrid");
+            if (!grid) return;
+            
+            grid.innerHTML = "";
+
+            consoleCommands.forEach(cmd => {
+                // Priority: 1. localStorage, 2. input.get_convar, 3. default value
+                let currentValue = cmd.default;
+                
+                // First check localStorage for saved preference
+                const savedValue = getConsoleCommandState(cmd.name);
+                if (savedValue !== null) {
+                    currentValue = savedValue;
+                    console.log(`Loaded ${cmd.name} from localStorage:`, currentValue);
+                } else if (typeof input !== "undefined" && typeof input.get_convar === "function") {
+                    // Fallback to game's convar if no localStorage value
+                    try {
+                        const storedValue = input.get_convar(cmd.name);
+                        if (storedValue !== null) {
+                            currentValue = storedValue === "true" || storedValue === "1";
+                        }
+                    } catch (e) {
+                        console.warn("Could not get convar:", cmd.name);
+                    }
+                }
+
+                const button = document.createElement("button");
+                button.className = "toggle-btn" + (currentValue ? " active" : "") + (cmd.important ? " important" : "");
+                
+                let displayName = cmd.displayName;
+                if (!displayName) {
+                    displayName = cmd.name
+                        .replace("ren_", "")
+                        .replace("net_", "")
+                        .replace(/_/g, " ")
+                        .split(" ")
+                        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                        .join(" ");
+                }
+                
+                button.innerHTML = `
+                    <span class="toggle-label">${displayName}</span>
+                    <span class="toggle-indicator"></span>
+                `;
+
+                button.addEventListener("click", () => {
+                    const isActive = button.classList.contains("active");
+                    const newValue = !isActive;
+                    
+                    button.classList.toggle("active");
+                    
+                    // Save to localStorage
+                    setConsoleCommandState(cmd.name, newValue);
+                    console.log(`Saved ${cmd.name} to localStorage:`, newValue);
+                    
+                    // Execute command in game
+                    if (typeof input !== "undefined" && typeof input.execute === "function") {
+                        try {
+                            input.execute(`${cmd.name} ${newValue}`);
+                            console.log(`Executed: ${cmd.name} ${newValue}`);
+                        } catch (e) {
+                            console.error("Command execution failed:", e);
+                            button.classList.toggle("active");
+                            // Revert localStorage if execution failed
+                            setConsoleCommandState(cmd.name, isActive);
+                        }
+                    } else {
+                        console.warn("input.execute not available yet");
+                    }
+                });
+
+                grid.appendChild(button);
+            });
+            
+            // Apply all saved states on initialization
+            consoleCommands.forEach(cmd => {
+                const savedValue = getConsoleCommandState(cmd.name);
+                if (savedValue !== null && typeof input !== "undefined" && typeof input.execute === "function") {
+                    try {
+                        input.execute(`${cmd.name} ${savedValue}`);
+                        console.log(`Applied saved preference for ${cmd.name}:`, savedValue);
+                    } catch (e) {
+                        console.warn(`Could not apply saved preference for ${cmd.name}:`, e);
+                    }
+                }
+            });
+            
+            consoleCommandsInitialized = true;
+        }
+
+        // Profile pill click handler
+        profilePill.addEventListener("click", (e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            toggleMenu();
+        }, true);
+
+        // Close button handler
+        document.addEventListener("DOMContentLoaded", () => {
+            const closeBtn = document.getElementById("menuCloseBtn");
+            if (closeBtn) {
+                closeBtn.addEventListener("click", (e) => {
+                    e.stopPropagation();
+                    closeMenu();
+                });
+            }
+        });
+
+        function toggleMenu() {
+            const isVisible = profileMenu.style.display === "block";
+            if (isVisible) {
+                closeMenu();
+            } else {
+                openMenu();
+            }
+        }
+
+        function openMenu() {
+            profileMenu.style.display = "block";
+            menuManuallyOpened = true;
+            window.disableInputs = true;
+        }
+
+        function closeMenu() {
+            profileMenu.style.display = "none";
+            menuManuallyOpened = false;
+            window.disableInputs = false;
+        }
+
+        // Close menu when clicking outside
+        /*document.addEventListener("click", (e) => {
+            if (profileMenu.contains(e.target) || profileWidget.contains(e.target)) {
+                return;
+            }
+            closeMenu();
+        }, true);*/
+
+        // Keybind system - MAIN MENU
+        let menuKeybind = localStorage.getItem("menuKeybind") || "Escape";
+        let isWaitingForKeybind = false;
+        let isWaitingForTeamHudKeybind = false;
+
+        function updateMainMenuTeamHudDisplay() {
+            try {
+                const hudEnabled = document.getElementById("mainMenuTeamHudEnabled");
+                const arrowsEnabled = document.getElementById("mainMenuTeamArrowsEnabled");
+                const arrowsScaleSel = document.getElementById("mainMenuTeamArrowsScale");
+                const bindText = document.getElementById("mainMenuTeamHudBindText");
+                const bind = localStorage.getItem("ds_teamHud_bind") || "Tab";
+                if (hudEnabled) hudEnabled.checked = localStorage.getItem("ds_teamHud_enabled") !== "0";
+                if (arrowsEnabled) arrowsEnabled.checked = localStorage.getItem("ds_teamArrows_enabled") !== "0";
+                if (arrowsScaleSel) {
+                    const raw = localStorage.getItem("ds_teamArrows_scale") || "1";
+                    if (["0.8","1","1.3"].includes(raw)) arrowsScaleSel.value = raw;
+                }
+                if (bindText) bindText.textContent = (bind || "").replace(/^Key/, "").replace(/^Digit/, "");
+            } catch (err) {}
+        }
+
+        function formatKey(code) {
+            if (!code) return "Unset";
+            return code.replace(/^Key/, "").replace(/^Digit/, "");
+        }
+        
+        function updateKeybindDisplay() {
+            const keybindText = document.getElementById("keybindText");
+            if (keybindText) {
+                const displayName = menuKeybind.replace("Key", "").replace("Digit", "");
+                keybindText.textContent = `Press ${displayName}`;
+            }
+        }
+        
+        // Keybind system - DIEP STYLE
+        let diepStyleKeybind = localStorage.getItem("diepStyleKeybind") || "KeyQ";
+        let isWaitingForDiepStyleKeybind = false;
+        
+        function updateDiepStyleKeybindDisplay() {
+            const keybindText = document.getElementById("diepStyleKeybindText");
+            if (keybindText) {
+                const displayName = diepStyleKeybind.replace("Key", "").replace("Digit", "");
+                keybindText.textContent = `Press ${displayName}`;
+            }
+        }
+        
+        setTimeout(() => {
+            // Main menu keybind button
+            const keybindBtn = document.getElementById("keybindBtn");
+            if (keybindBtn) {
+                updateKeybindDisplay();
+                
+                keybindBtn.addEventListener("click", (e) => {
+                    e.stopPropagation();
+                    isWaitingForKeybind = true;
+                    isWaitingForDiepStyleKeybind = false;
+                    document.getElementById("keybindText").textContent = "Press any key...";
+                    keybindBtn.style.borderColor = "rgba(0, 212, 255, 0.7)";
+                    const diepStyleBtn = document.getElementById("diepStyleKeybindBtn");
+                    if (diepStyleBtn) diepStyleBtn.style.borderColor = "";
+                });
+            }
+            
+            // Diep style keybind button
+            const diepStyleKeybindBtn = document.getElementById("diepStyleKeybindBtn");
+            if (diepStyleKeybindBtn) {
+                updateDiepStyleKeybindDisplay();
+                
+                diepStyleKeybindBtn.addEventListener("click", (e) => {
+                    e.stopPropagation();
+                    isWaitingForDiepStyleKeybind = true;
+                    isWaitingForKeybind = false;
+                    document.getElementById("diepStyleKeybindText").textContent = "Press any key...";
+                    diepStyleKeybindBtn.style.borderColor = "rgba(0, 212, 255, 0.7)";
+                    const mainMenuBtn = document.getElementById("keybindBtn");
+                    if (mainMenuBtn) mainMenuBtn.style.borderColor = "";
+                });
+            }
+
+            // Team HUD (health HUD + teammate arrows) - main menu controls
+            const TEAM_HUD_KEY = "ds_teamHud_enabled";
+            const TEAM_HUD_BIND_KEY = "ds_teamHud_bind";
+            const TEAM_ARROWS_KEY = "ds_teamArrows_enabled";
+
+            updateMainMenuTeamHudDisplay();
+
+            const mainMenuTeamHudEnabled = document.getElementById("mainMenuTeamHudEnabled");
+            if (mainMenuTeamHudEnabled) {
+                mainMenuTeamHudEnabled.addEventListener("change", () => {
+                    try { localStorage.setItem(TEAM_HUD_KEY, mainMenuTeamHudEnabled.checked ? "1" : "0"); } catch {}
+                    window.dispatchEvent(new CustomEvent("ds_team_hud_changed"));
+                });
+            }
+            const mainMenuTeamArrowsEnabled = document.getElementById("mainMenuTeamArrowsEnabled");
+            if (mainMenuTeamArrowsEnabled) {
+                mainMenuTeamArrowsEnabled.addEventListener("change", () => {
+                    try { localStorage.setItem(TEAM_ARROWS_KEY, mainMenuTeamArrowsEnabled.checked ? "1" : "0"); } catch {}
+                    window.dispatchEvent(new CustomEvent("ds_team_hud_changed"));
+                });
+            }
+            const mainMenuTeamArrowsScale = document.getElementById("mainMenuTeamArrowsScale");
+            if (mainMenuTeamArrowsScale) {
+                mainMenuTeamArrowsScale.addEventListener("change", () => {
+                    try { localStorage.setItem("ds_teamArrows_scale", mainMenuTeamArrowsScale.value || "1"); } catch {}
+                    window.dispatchEvent(new CustomEvent("ds_team_hud_changed"));
+                });
+            }
+            const mainMenuTeamHudBindBtn = document.getElementById("mainMenuTeamHudBindBtn");
+            if (mainMenuTeamHudBindBtn) {
+                mainMenuTeamHudBindBtn.addEventListener("click", (e) => {
+                    e.stopPropagation();
+                    isWaitingForKeybind = false;
+                    isWaitingForDiepStyleKeybind = false;
+                    isWaitingForTeamHudKeybind = true;
+                    document.getElementById("mainMenuTeamHudBindText").textContent = "Press any key...";
+                    mainMenuTeamHudBindBtn.style.borderColor = "rgba(0, 212, 255, 0.7)";
+                    document.getElementById("keybindBtn").style.borderColor = "";
+                    const dsBtn = document.getElementById("diepStyleKeybindBtn");
+                    if (dsBtn) dsBtn.style.borderColor = "";
+                });
+            }
+
+        }, 1500);
+
+        // Unified keybind handler
+        document.addEventListener("keydown", (e) => {
+            // Handle keybind setting
+            if (isWaitingForKeybind) {
+                e.preventDefault();
+                e.stopPropagation();
+                menuKeybind = e.code;
+                localStorage.setItem("menuKeybind", menuKeybind);
+                updateKeybindDisplay();
+                isWaitingForKeybind = false;
+                const keybindBtn = document.getElementById("keybindBtn");
+                if (keybindBtn) keybindBtn.style.borderColor = "";
+                return;
+            }
+            
+            if (isWaitingForDiepStyleKeybind) {
+                e.preventDefault();
+                e.stopPropagation();
+                diepStyleKeybind = e.code;
+                localStorage.setItem("diepStyleKeybind", diepStyleKeybind);
+                updateDiepStyleKeybindDisplay();
+                isWaitingForDiepStyleKeybind = false;
+                const diepStyleKeybindBtn = document.getElementById("diepStyleKeybindBtn");
+                if (diepStyleKeybindBtn) diepStyleKeybindBtn.style.borderColor = "";
+                return;
+            }
+
+            if (isWaitingForTeamHudKeybind) {
+                e.preventDefault();
+                e.stopPropagation();
+                try { localStorage.setItem("ds_teamHud_bind", e.code); } catch {}
+                updateMainMenuTeamHudDisplay();
+                isWaitingForTeamHudKeybind = false;
+                const btn = document.getElementById("mainMenuTeamHudBindBtn");
+                if (btn) btn.style.borderColor = "";
+                window.dispatchEvent(new CustomEvent("ds_team_hud_changed"));
+                return;
+            }
+
+            // Handle main menu keybind
+            if (e.code === menuKeybind) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const isMenuVisible = profileMenu.style.display === "block";
+                
+                if (isMenuVisible) {
+                    closeMenu();
+                } else {
+                    openMenu();
+                    
+                    if (typeof input !== "undefined" && typeof input.should_prevent_unload === "function") {
+                        const inGame = input.should_prevent_unload() === 1;
+                        if (inGame) {
+                            menuManuallyOpened = true;
+                        }
+                    }
+                }
+            }
+            
+            // Handle diep style keybind
+            if (e.code === diepStyleKeybind) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                if (window.toggleDiepStyle) {
+                    window.toggleDiepStyle();
+                }
+            }
+        }, true);
+
+        /*
+        screenshotBtn.addEventListener("click", () => {
+            adminTest();
+        });
+        */
+        // End game button handler
+        endGameBtn.addEventListener("click", () => {
+            if (confirm("Are you sure you want to end the current game?")) {
+                adminCloseArena();
+                alert("Game ended successfully");
+                profileMenu.style.display = "none";
+            }
+        });
+
+        // Announcement button handler
+        announcementBtn.addEventListener("click", () => {
+            const modal = document.getElementById("announcementModal");
+            if (modal) modal.classList.add("active");
+        });
+
+        // Announcement modal handlers
+        document.getElementById("announcementModalClose").addEventListener("click", () => {
+            const modal = document.getElementById("announcementModal");
+            if (modal) modal.classList.remove("active");
+        });
+
+        document.getElementById("announcementCancel").addEventListener("click", () => {
+            const modal = document.getElementById("announcementModal");
+            if (modal) modal.classList.remove("active");
+        });
+
+        document.getElementById("announcementSend").addEventListener("click", () => {
+            const message = document.getElementById("announcementMessage").value.trim();
+            const colorHex = document.getElementById("announcementColor").value;
+            const ttlSeconds = parseInt(document.getElementById("announcementTTL").value) || 15;
+            const id = document.getElementById("announcementID").value.trim();
+
+            if (!message) {
+                alert("Please enter a message");
+                return;
+            }
+
+            // Convert hex color to 0xRRGGBB format
+            const color = parseInt(colorHex.slice(1), 16);
+            
+            // Convert seconds to milliseconds
+            const ttl = ttlSeconds * 1000;
+
+            // Use the announceMessage function from util.js
+            if (typeof announceMessage === "function") {
+                try {
+                    announceMessage(message, color, ttl, id);
+                    console.log("Announcement sent:", message, color, ttl, id);
+                    
+                    // Close modal and reset form
+                    const modal = document.getElementById("announcementModal");
+                    if (modal) modal.classList.remove("active");
+                    document.getElementById("announcementMessage").value = "";
+                    document.getElementById("announcementID").value = "";
+                    
+                    // Show success message
+                    const notification = document.createElement("div");
+                    notification.textContent = "Announcement sent successfully!";
+                    notification.style.cssText = `
+                        position: fixed;
+                        top: 20px;
+                        right: 20px;
+                        background: rgba(34, 197, 94, 0.9);
+                        color: white;
+                        padding: 12px 20px;
+                        border-radius: 8px;
+                        font-family: Ubuntu, sans-serif;
+                        font-weight: bold;
+                        z-index: 10001;
+                        animation: slideInRight 0.3s ease-out;
+                    `;
+                    document.body.appendChild(notification);
+                    setTimeout(() => {
+                        notification.style.animation = "slideOutRight 0.3s ease-in";
+                        setTimeout(() => notification.remove(), 300);
+                    }, 3000);
+                } catch (e) {
+                    console.error("Failed to send announcement:", e);
+                    alert("Failed to send announcement");
+                }
+            } else {
+                alert("Announcement function not available");
+            }
+        });
+
+        // Close announcement modal when clicking outside
+        document.getElementById("announcementModal").addEventListener("click", (e) => {
+            if (e.target.id === "announcementModal") {
+                e.target.classList.remove("active");
+            }
+        }, true);
+
+        // Restore defaults button handler
+        document.getElementById("restoreDefaultsBtn").addEventListener("click", () => {
+            if (confirm("Reset all console commands to their default values?")) {
+                // Clear all localStorage saved states
+                clearAllConsoleCommandStates();
+                console.log("Cleared all console command preferences from localStorage");
+                
+                // Reset commands to defaults in game
+                consoleCommands.forEach(cmd => {
+                    if (typeof input !== "undefined" && typeof input.execute === "function") {
+                        try {
+                            input.execute(`${cmd.name} ${cmd.default}`);
+                        } catch (e) {
+                            console.error("Failed to reset:", cmd.name);
+                        }
+                    }
+                });
+                
+                // Reinitialize UI
+                consoleCommandsInitialized = false;
+                initConsoleCommands();
+                
+                alert("Console commands restored to defaults!");
+            }
+        });
+
+        // Logout button handler
+        document.getElementById("logoutBtn").addEventListener("click", async () => {
+            if (confirm("Are you sure you want to logout?")) {
+                try {
+                    await fetch("/api/logout", { 
+                        method: "POST",
+                        credentials: "include" 
+                    }).catch(() => {
+                        console.log("No logout endpoint, clearing session client-side");
+                    });
+                } catch (error) {
+                    console.error("Logout error:", error);
+                }
+                
+                gameScreen.style.display = "none";
+                profileMenu.style.display = "none";
+                authScreen.style.display = "flex";
+            }
+        });
+    </script>
+
+    <!-- Load Diep Style -->
+    <script>
+        fetch("./diepStyle.html")
+            .then(res => res.text())
+            .then(html => {
+                const temp = document.createElement("div");
+                temp.innerHTML = html;
+                document.body.appendChild(temp);
+                console.log("Diep Style HTML loaded successfully!");
+            })
+            .catch(err => console.error("Failed to load diepStyle.html:", err));
+    </script>
+    <script src="./diepStyle.js"></script>
+</body>
+</html>

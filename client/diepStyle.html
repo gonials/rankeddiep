@@ -1,0 +1,688 @@
+<!-- Diep Style Menu HTML -->
+<div id="diepStyleMenu" style="display: none;">
+    <div class="diep-style-panel">
+        <div class="diep-style-close" id="diepStyleClose">×</div>
+        
+        <div class="diep-style-header">
+            <h2>Diep Style</h2>
+            <div id="diepStyleThemeInfo" class="diep-style-theme-info"></div>
+        </div>
+
+        <div class="diep-style-content">
+            <!-- Default Themes Section -->
+            <section class="diep-style-section">
+                <h3 class="diep-style-section-title-custom">Default Themes</h3>
+                <div class="diep-style-themes-default">
+                    <button class="diep-style-theme-btn diep-style-theme-default" data-theme="80s">80s</button>
+                    <button class="diep-style-theme-btn diep-style-theme-default" data-theme="moomoo">Moomoo</button>
+                    <button class="diep-style-theme-btn diep-style-theme-default" data-theme="dark">Dark</button>
+                    <button class="diep-style-theme-btn diep-style-theme-default" data-theme="glass">Glass</button>
+                </div>
+            </section>
+
+            <!-- Community Themes Section -->
+            <section class="diep-style-section">
+                <h3 class="diep-style-section-title-custom">Community Themes</h3>
+                <div class="diep-style-themes-community">
+                    <button class="diep-style-theme-btn" data-theme="incantation">Incantation</button>
+                    <button class="diep-style-theme-btn" data-theme="juicebear">Juicebear 3.1</button>
+                    <button class="diep-style-theme-btn" data-theme="calm">Calm</button>
+                    <button class="diep-style-theme-btn" data-theme="mania">Mania</button>
+                    <button class="diep-style-theme-btn" data-theme="defaultplus">defaultPlus</button>
+                </div>
+            </section>
+
+            <!-- Render Settings Section -->
+            <section class="diep-style-section">
+                <h3>Render Settings</h3>
+                <div id="diepStyleRenderSettings" class="diep-style-renders"></div>
+            </section>
+
+            <!-- Colors Section -->
+            <section class="diep-style-section">
+                <h3>Colors</h3>
+                <div id="diepStyleColors" class="diep-style-colors-grid"></div>
+            </section>
+        </div>
+
+        <!-- Footer -->
+        <div class="diep-style-footer">
+            <div class="diep-style-slots">
+                <button class="diep-style-slot" data-slot="0">Default</button>
+                <button class="diep-style-slot" data-slot="1">1</button>
+                <button class="diep-style-slot" data-slot="2">2</button>
+                <button class="diep-style-slot" data-slot="3">3</button>
+                <button class="diep-style-slot" data-slot="4">4</button>
+                <button class="diep-style-slot" data-slot="5">5</button>
+            </div>
+            <div class="diep-style-actions">
+                <button class="diep-style-btn diep-style-btn-green" id="diepStyleImport">Import</button>
+                <button class="diep-style-btn diep-style-btn-purple" id="diepStyleExport">Export</button>
+                <button class="diep-style-btn diep-style-btn-yellow" id="diepStyleLock">Unlocked</button>
+                <button class="diep-style-btn diep-style-btn-red" id="diepStyleReset">Reset</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast Notification -->
+<div id="diepStyleToast" class="diep-style-toast"></div>
+
+<!-- Import Modal -->
+<div id="diepStyleImportModal" class="diep-style-modal">
+    <div class="diep-style-modal-content">
+        <div class="diep-style-modal-header">
+            <h3>Import Theme</h3>
+            <div class="diep-style-modal-close">×</div>
+        </div>
+        <div class="diep-style-modal-body">
+            <label>Paste JSON Configuration</label>
+            <textarea id="diepStyleImportText" rows="10" placeholder='[{"theme":{"name":"My Theme","author":"Me"}},{"id":2,"value":"00b1de"}...]'></textarea>
+            <p class="diep-style-modal-hint">Paste your exported theme JSON or get themes from the community</p>
+        </div>
+        <div class="diep-style-modal-footer">
+            <button class="diep-style-btn" id="diepStyleImportCancel">Cancel</button>
+            <button class="diep-style-btn diep-style-btn-green" id="diepStyleImportConfirm">Import Theme</button>
+        </div>
+    </div>
+</div>
+
+<!-- Export Modal -->
+<div id="diepStyleExportModal" class="diep-style-modal">
+    <div class="diep-style-modal-content">
+        <div class="diep-style-modal-header">
+            <h3>Export Theme</h3>
+            <div class="diep-style-modal-close">×</div>
+        </div>
+        <div class="diep-style-modal-body">
+            <label>Theme Name</label>
+            <input type="text" id="diepStyleExportName" placeholder="My Awesome Theme">
+            <label>Author Name</label>
+            <input type="text" id="diepStyleExportAuthor" placeholder="Your Name">
+        </div>
+        <div class="diep-style-modal-footer">
+            <button class="diep-style-btn" id="diepStyleExportCancel">Cancel</button>
+            <button class="diep-style-btn diep-style-btn-purple" id="diepStyleExportConfirm">Copy to Clipboard</button>
+        </div>
+    </div>
+</div>
+
+<!-- Reset Confirm Modal -->
+<div id="diepStyleResetModal" class="diep-style-modal">
+    <div class="diep-style-modal-content">
+        <div class="diep-style-modal-header">
+            <h3>Reset to Defaults?</h3>
+            <div class="diep-style-modal-close">×</div>
+        </div>
+        <div class="diep-style-modal-body">
+            <p>This will reset all colors and render settings to their default values. This action cannot be undone.</p>
+        </div>
+        <div class="diep-style-modal-footer">
+            <button class="diep-style-btn" id="diepStyleResetCancel">Cancel</button>
+            <button class="diep-style-btn diep-style-btn-red" id="diepStyleResetConfirm">Reset Settings</button>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Diep Style Menu Styles */
+#diepStyleMenu {
+    position: fixed;
+    inset: 0;
+    z-index: 9998;
+    pointer-events: none;
+    font-family: 'Ubuntu', sans-serif;
+}
+
+.diep-style-panel {
+    position: fixed;
+    top: 50%;
+    left: 40px;
+    transform: translateY(-50%);
+    width: 480px;
+    max-height: 75vh;
+    background: rgba(20, 20, 30, 0.98);
+    backdrop-filter: blur(16px);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: slideInLeft 0.3s ease-out;
+    pointer-events: auto;
+}
+
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateY(-50%) translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(-50%) translateX(0);
+    }
+}
+
+.diep-style-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 32px;
+    height: 32px;
+    background: rgba(255, 50, 50, 0.2);
+    border: 1px solid rgba(255, 50, 50, 0.4);
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    color: #ff5555;
+    transition: all 0.2s ease;
+    z-index: 10;
+    font-family: 'Ubuntu', sans-serif;
+}
+
+.diep-style-close:hover {
+    background: rgba(255, 50, 50, 0.3);
+    border-color: rgba(255, 50, 50, 0.6);
+    transform: scale(1.1);
+}
+
+.diep-style-header {
+    padding: 24px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.diep-style-header h2 {
+    font-size: 24px;
+    font-weight: bold;
+    color: white;
+    margin: 0;
+    font-family: 'Ubuntu', sans-serif;
+}
+
+.diep-style-theme-info {
+    margin-top: 8px;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.7);
+    font-family: 'Ubuntu', sans-serif;
+}
+
+.diep-style-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+}
+
+.diep-style-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.diep-style-content::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.diep-style-content::-webkit-scrollbar-thumb {
+    background: rgba(0, 212, 255, 0.3);
+    border-radius: 4px;
+}
+
+.diep-style-section {
+    margin-bottom: 24px;
+}
+
+.diep-style-section h3 {
+    font-size: 14px;
+    font-weight: 600;
+    color: white;
+    margin: 0 0 12px 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-family: 'Ubuntu', sans-serif;
+}
+
+.diep-style-section-title-custom {
+    font-size: 14px;
+    font-weight: 600;
+    color: white;
+    margin: 0 0 12px 0;
+    text-transform: none !important;
+    letter-spacing: 0.5px;
+    font-family: 'Ubuntu', sans-serif;
+}
+
+.diep-style-themes-default {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 8px;
+}
+
+.diep-style-themes-community {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+}
+
+.diep-style-theme-btn {
+    padding: 8px 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: white;
+    font-size: 11px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-transform: capitalize;
+    font-family: 'Ubuntu', sans-serif;
+}
+
+.diep-style-theme-btn:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(0, 212, 255, 0.5);
+}
+
+.diep-style-theme-btn.diep-style-theme-default {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.diep-style-theme-btn.diep-style-theme-default:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(0, 212, 255, 0.5);
+}
+
+.diep-style-theme-btn.diep-style-theme-coming {
+    background: rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.5);
+    cursor: not-allowed;
+}
+
+.diep-style-theme-btn.diep-style-theme-coming:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.diep-style-renders {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.diep-style-render-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(255, 255, 255, 0.03);
+    padding: 12px;
+    border-radius: 8px;
+}
+
+.diep-style-render-label {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.9);
+    flex: 1;
+    font-family: 'Ubuntu', sans-serif;
+}
+
+.diep-style-render-value {
+    margin-left: 8px;
+    color: #60a5fa;
+    font-family: 'Ubuntu', monospace;
+    font-size: 12px;
+}
+
+.diep-style-checkbox {
+    width: 20px;
+    height: 20px;
+    accent-color: #60a5fa;
+    cursor: pointer;
+}
+
+.diep-style-checkbox:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.diep-style-slider {
+    width: 128px;
+    accent-color: #60a5fa;
+    cursor: pointer;
+}
+
+.diep-style-slider:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.diep-style-colors-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 6px;
+}
+
+.diep-style-color-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255, 255, 255, 0.03);
+    padding: 6px 8px;
+    border-radius: 8px;
+}
+
+.diep-style-color-input {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    flex-shrink: 0;
+    padding: 0;
+    background: transparent;
+}
+
+.diep-style-color-input::-webkit-color-swatch-wrapper {
+    padding: 0;
+    background: transparent;
+}
+
+.diep-style-color-input::-webkit-color-swatch {
+    border: none;
+    border-radius: 6px;
+}
+
+.diep-style-color-input::-moz-color-swatch {
+    border: none;
+    border-radius: 6px;
+}
+
+.diep-style-color-input:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.diep-style-color-name {
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.9);
+    flex: 1;
+    line-height: 1.2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-family: 'Ubuntu', sans-serif;
+}
+
+.diep-style-footer {
+    padding: 16px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(15, 23, 42, 0.5);
+}
+
+.diep-style-slots {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.diep-style-slot {
+    flex: 1;
+    padding: 8px;
+    font-size: 12px;
+    font-weight: 500;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.7);
+    font-family: 'Ubuntu', sans-serif;
+}
+
+.diep-style-slot:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+}
+
+.diep-style-slot.active {
+    background: #60a5fa;
+    color: white;
+}
+
+.diep-style-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.diep-style-btn {
+    flex: 1;
+    padding: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    font-family: 'Ubuntu', sans-serif;
+}
+
+.diep-style-btn:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateY(-1px);
+}
+
+.diep-style-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.diep-style-btn-green {
+    background: rgba(34, 197, 94, 0.2);
+    border: 1px solid rgba(34, 197, 94, 0.4);
+}
+
+.diep-style-btn-green:hover:not(:disabled) {
+    background: rgba(34, 197, 94, 0.3);
+}
+
+.diep-style-btn-purple {
+    background: rgba(168, 85, 247, 0.2);
+    border: 1px solid rgba(168, 85, 247, 0.4);
+}
+
+.diep-style-btn-purple:hover:not(:disabled) {
+    background: rgba(168, 85, 247, 0.3);
+}
+
+.diep-style-btn-yellow {
+    background: rgba(234, 179, 8, 0.2);
+    border: 1px solid rgba(234, 179, 8, 0.4);
+}
+
+.diep-style-btn-yellow:hover:not(:disabled) {
+    background: rgba(234, 179, 8, 0.3);
+}
+
+.diep-style-btn-red {
+    background: rgba(239, 68, 68, 0.2);
+    border: 1px solid rgba(239, 68, 68, 0.4);
+}
+
+.diep-style-btn-red:hover:not(:disabled) {
+    background: rgba(239, 68, 68, 0.3);
+}
+
+/* Toast */
+.diep-style-toast {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10000;
+    padding: 16px 24px;
+    border-radius: 8px;
+    background: rgba(34, 197, 94, 0.9);
+    color: white;
+    font-weight: 500;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    display: none;
+    animation: slideInTop 0.3s ease-out;
+    font-family: 'Ubuntu', sans-serif;
+}
+
+.diep-style-toast.error {
+    background: rgba(239, 68, 68, 0.9);
+}
+
+@keyframes slideInTop {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+/* Modal */
+.diep-style-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 10001;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+}
+
+.diep-style-modal.active {
+    display: flex;
+}
+
+.diep-style-modal-content {
+    width: 90%;
+    max-width: 550px;
+    background: rgba(20, 20, 30, 0.98);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    animation: scaleIn 0.2s ease-out;
+}
+
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.diep-style-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.diep-style-modal-header h3 {
+    font-size: 18px;
+    font-weight: bold;
+    color: #00d4ff;
+    margin: 0;
+    font-family: 'Ubuntu', sans-serif;
+}
+
+.diep-style-modal-close {
+    width: 32px;
+    height: 32px;
+    background: rgba(255, 50, 50, 0.2);
+    border: 1px solid rgba(255, 50, 50, 0.4);
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    color: #ff5555;
+    transition: all 0.2s ease;
+    font-family: 'Ubuntu', sans-serif;
+}
+
+.diep-style-modal-close:hover {
+    background: rgba(255, 50, 50, 0.3);
+    border-color: rgba(255, 50, 50, 0.6);
+    transform: scale(1.1);
+}
+
+.diep-style-modal-body {
+    padding: 24px;
+}
+
+.diep-style-modal-body label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-family: 'Ubuntu', sans-serif;
+}
+
+.diep-style-modal-body input,
+.diep-style-modal-body textarea {
+    width: 100%;
+    padding: 10px 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    color: white;
+    font-size: 13px;
+    font-family: 'Ubuntu', sans-serif;
+    margin-bottom: 16px;
+    transition: border-color 0.2s ease;
+}
+
+.diep-style-modal-body textarea {
+    font-family: 'Ubuntu', monospace;
+    resize: vertical;
+}
+
+.diep-style-modal-body input:focus,
+.diep-style-modal-body textarea:focus {
+    outline: none;
+    border-color: #00d4ff;
+}
+
+.diep-style-modal-hint {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.5);
+    margin-top: -8px;
+    margin-bottom: 0;
+    font-family: 'Ubuntu', sans-serif;
+}
+
+.diep-style-modal-body p {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 14px;
+    line-height: 1.5;
+    font-family: 'Ubuntu', sans-serif;
+    margin: 0;
+}
+
+.diep-style-modal-footer {
+    display: flex;
+    gap: 12px;
+    padding: 24px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+</style>
